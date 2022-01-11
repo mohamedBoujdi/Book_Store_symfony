@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Livres
+{% endblock %}
+
+{% block body %}
+	<h1>Livres</h1>
+	<div class="container">
+				<form  action="{{path('livre_chercher')}}" class="row" >
+					<span>Chercher</span>
+					<div class="col-4">
+						<input id="motCle" name="k" value="{{keyword}}" type="text" class="form-control" placeholder="chercher...">
+					</div>
+					<div class="col-4">
+						<input id="dateMin"  name="dmn"  value="{{datemin}}" type="date" class="form-control" placeholder="Date min">
+					</div>
+					<div class="col-4">
+						<input id="dateMax"  name="dmx" type="date" value="{{datemax}}" class="form-control" placeholder="Date max">
+					</div>
+					<div class="col-3">
+						<select class="form-select mt-2" name="n" >
+							<option selected value="">selectionnez une note</option>
+							{% for i in 0..20 %}
+								<option value="{{ i }}" {% if i == note %}selected{% endif %}>{{ i }}</option>
+							{% endfor %}
+						</select>
+					 </div>
+					 <div class="col-3">
+						<input id="datepub"  name="p" value="{{datepub}}"  type="date" class="form-control mt-2" placeholder="Date publication">
+					 </div>
+					 <div class="col-3">
+						<select class="form-select mt-2"  name="a">
+							<option selected value=""> selectionnez un auteur</option>
+							{% for auteur in auteurs %}
+								<option value="{{auteur.id}}" {% if auteur.id== auteurch  %}selected{% endif %} >{{auteur.nomPrenom}}</option>
+							{% endfor %}
+						</select>
+					 </div>
+					 <div class="col-3">
+						<select class="form-select mt-2" name="g">
+							<option selected value="">selectionnez une genre</option>
+							{% for genre in genres %}
+								<option value="{{genre.id}}" {% if genre.id== genrech  %}selected{% endif %}>{{genre.nom}}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="col-3"> 
+						<button class="btn btn-primary my-2" >rechercher</button>
+					</div>
+
+					
+				</form>
+
+	</div>
+	
+
+	
+	{% if is_granted('ROLE_ADMIN') %}
+	<a class="btn btn-primary float-end" href="{{ path('livre_new') }}">Add</a>
+    {% endif %}
+	<table id="livres" class="table mt-5">
+		<thead>
+			<tr>
+				<th>Isbn</th>
+				<th>Titre</th>
+				<th>Nombre de pages</th>
+				<th>Date de parution</th>
+				<th>Note</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for livre in livres %}
+				<tr>
+					<td>{{ livre.isbn }}</td>
+					<td>{{ livre.titre }}</td>
+					<td>{{ livre.nombrePages }}</td>
+					<td>{{ livre.dateDeParution ? livre.dateDeParution|date('Y-m-d') : '' }}</td>
+
+					<td>
+						<span id="livre-note-{{ livre.id }}">{{ livre.note }}</span>
+					</td>
+
+
+					<td>
+						<a class="btn btn-success" href="{{ path('livre_show', {'id': livre.id}) }}">show</a>
+						{% if is_granted('ROLE_ADMIN') %}
+							<a class="btn btn-outline-warning" href="{{ path('livre_edit', {'id': livre.id}) }}">Modify</a>
+							{{ include('livre/_delete_form.html.twig') }}
+						{% endif %}
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">Aucun résultat</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+	
+{% endblock %}
+
